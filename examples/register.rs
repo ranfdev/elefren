@@ -13,7 +13,7 @@ use self::elefren::{
 };
 
 #[cfg(feature = "toml")]
-use self::elefren::data::toml;
+use self::elefren::helpers::toml;
 
 #[allow(dead_code)]
 #[cfg(feature = "toml")]
