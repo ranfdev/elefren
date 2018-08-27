@@ -1,3 +1,6 @@
+/// Contains a macro to generate code for completing a Registration via the
+/// command line
+pub mod cli_login;
 #[cfg(feature = "toml")]
 /// Helpers for serializing to/deserializing from toml
 ///

@@ -1,13 +1,13 @@
 #![cfg_attr(not(feature = "toml"), allow(dead_code))]
 #![cfg_attr(not(feature = "toml"), allow(unused_imports))]
-extern crate elefren;
 
-pub use self::elefren::prelude::*;
+#[cfg(feature = "toml")]
+use elefren::prelude::*;
 
 use std::{error::Error, io};
 
 #[cfg(feature = "toml")]
-use self::elefren::helpers::toml;
+use elefren::helpers::toml;
 
 #[allow(dead_code)]
 #[cfg(feature = "toml")]
@@ -34,12 +34,8 @@ pub fn register() -> Result<Mastodon, Box<Error>> {
         .scopes(Scopes::All)
         .website("https://github.com/pwoolcoc/elefren")
         .register()?;
-    let url = registration.authorize_url()?;
 
-    println!("Click this link to authorize on Mastodon: {}", url);
-    let code = read_line("Paste the returned authorization code: ")?;
-
-    let mastodon = registration.complete(code)?;
+    let mastodon = cli_login!(registration)?;
 
     // Save app data for using on the next run.
     toml::to_file(&*mastodon, "mastodon-data.toml")?;

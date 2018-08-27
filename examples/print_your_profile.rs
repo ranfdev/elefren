@@ -1,8 +1,13 @@
 #![cfg_attr(not(feature = "toml"), allow(dead_code))]
 #![cfg_attr(not(feature = "toml"), allow(unused_imports))]
+
+#[cfg_attr(feature = "toml", macro_use)]
+extern crate elefren;
+
+#[cfg(feature = "toml")]
 mod register;
 
-use register::MastodonClient;
+use elefren::MastodonClient;
 use std::error;
 
 #[cfg(feature = "toml")]
