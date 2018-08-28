@@ -42,7 +42,7 @@ pub fn register() -> Result<Mastodon, Box<Error>> {
     let mastodon = registration.complete(&code)?;
 
     // Save app data for using on the next run.
-    toml::to_file(&*mastodon, "mastodon-data.toml")?;
+    toml::to_file(mastodon.data(), "mastodon-data.toml")?;
 
     Ok(mastodon)
 }

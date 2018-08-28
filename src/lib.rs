@@ -60,7 +60,7 @@ extern crate tempfile;
 #[cfg_attr(all(test, feature = "toml"), macro_use)]
 extern crate indoc;
 
-use std::{borrow::Cow, ops};
+use std::borrow::Cow;
 
 use reqwest::{
     header::{Authorization, Bearer, Headers},
@@ -280,8 +280,17 @@ pub trait MastodonClient<H: HttpSend = HttpSender> {
 impl<H: HttpSend> Mastodon<H> {
     methods![get, post, delete,];
 
+    /// Returns a reference to the `Data` struct that makes up the client's auth data
+    pub fn data(&self) -> &Data {
+        &self.data
+    }
+
+    fn base(&self) -> &str {
+        &self.data().base
+    }
+
     fn route(&self, url: &str) -> String {
-        format!("{}{}", self.base, url)
+        format!("{}{}", self.base(), url)
     }
 
     pub(crate) fn send(&self, req: &mut RequestBuilder) -> Result<Response> {
@@ -450,7 +459,7 @@ impl<H: HttpSend> MastodonClient<H> for Mastodon<H> {
     where
         S: Into<Option<StatusesRequest<'a>>>,
     {
-        let mut url = format!("{}/api/v1/accounts/{}/statuses", self.base, id);
+        let mut url = format!("{}/api/v1/accounts/{}/statuses", self.base(), id);
 
         if let Some(request) = request.into() {
             url = format!("{}{}", url, request.to_querystring());
@@ -494,7 +503,7 @@ impl<H: HttpSend> MastodonClient<H> for Mastodon<H> {
     ) -> Result<Page<Account, H>> {
         let url = format!(
             "{}/api/v1/accounts/search?q={}&limit={}&following={}",
-            self.base,
+            self.base(),
             query,
             limit.unwrap_or(40),
             following
@@ -503,14 +512,6 @@ impl<H: HttpSend> MastodonClient<H> for Mastodon<H> {
         let response = self.send(&mut self.client.get(&url))?;
 
         Page::new(self, response)
-    }
-}
-
-impl<H: HttpSend> ops::Deref for Mastodon<H> {
-    type Target = Data;
-
-    fn deref(&self) -> &Self::Target {
-        &self.data
     }
 }
 
@@ -529,7 +530,6 @@ impl<H: HttpSend> MastodonBuilder<H> {
         }
     }
 
-    #[allow(dead_code)]
     pub fn client(&mut self, client: Client) -> &mut Self {
         self.client = Some(client);
         self
