@@ -46,7 +46,6 @@ extern crate doc_comment;
 extern crate isolang;
 #[macro_use]
 extern crate serde_json;
-extern crate serde_urlencoded;
 extern crate chrono;
 extern crate reqwest;
 extern crate serde;
