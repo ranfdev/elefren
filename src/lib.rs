@@ -46,7 +46,6 @@ extern crate doc_comment;
 extern crate isolang;
 #[macro_use]
 extern crate serde_json;
-extern crate serde_urlencoded;
 extern crate chrono;
 extern crate reqwest;
 extern crate serde;
@@ -192,6 +191,10 @@ impl<H: HttpSend> MastodonClient<H> for Mastodon<H> {
         (post (uri: Cow<'static, str>,)) follows: "follows" => Account,
         (post multipart (file: Cow<'static, str>,)) media: "media" => Attachment,
         (post) clear_notifications: "notifications/clear" => Empty,
+    }
+
+    route_v2! {
+        (get (q: &'a str, resolve: bool,)) search_v2: "search" => SearchResultV2,
     }
 
     route_id! {
