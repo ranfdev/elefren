@@ -71,13 +71,13 @@ extern crate tempfile;
 )]
 extern crate indoc;
 
-use std::{borrow::Cow, ops};
+use std::{borrow::Cow, ops, fmt::Debug, io::Read};
 
-use reqwest::{Client, RequestBuilder, Response};
+use reqwest::{Client, RequestBuilder};
 use tap_reader::Tap;
 
 use entities::prelude::*;
-use http_send::{HttpSend, HttpSender};
+use http_send::{HttpSend, HttpSender, Response};
 use page::Page;
 
 pub use data::Data;
@@ -146,7 +146,7 @@ impl<H: HttpSend> Mastodon<H> {
         format!("{}{}", self.base, url)
     }
 
-    pub(crate) fn send(&self, req: RequestBuilder) -> Result<Response> {
+    pub(crate) fn send<T: Debug + Read>(&self, req: RequestBuilder) -> Result<Response<T>> {
         Ok(self
             .http_sender
             .send(&self.client, req.bearer_auth(&self.token))?)
@@ -457,7 +457,7 @@ impl<H: HttpSend> MastodonBuilder<H> {
 
 // Convert the HTTP response body from JSON. Pass up deserialization errors
 // transparently.
-fn deserialise<T: for<'de> serde::Deserialize<'de>>(response: Response) -> Result<T> {
+fn deserialise<T: for<'de> serde::Deserialize<'de>, U: Debug + Read>(response: Response<U>) -> Result<T> {
     let mut reader = Tap::new(response);
 
     match serde_json::from_reader(&mut reader) {

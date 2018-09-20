@@ -1,11 +1,12 @@
+use std::{fmt::Debug, io::Read};
 use super::{deserialise, Mastodon, Result};
 use entities::itemsiter::ItemsIter;
 use hyper_old_types::header::{parsing, Link, RelationType};
-use reqwest::{header::LINK, Response};
+use reqwest::header::LINK;
 use serde::Deserialize;
 use url::Url;
 
-use http_send::HttpSend;
+use http_send::{HttpSend, Response};
 
 /// Represents a single page of API results
 #[derive(Debug, Clone)]
@@ -49,7 +50,7 @@ impl<'a, T: for<'de> Deserialize<'de>, H: HttpSend> Page<'a, T, H> {
         prev: prev_page
     }
 
-    pub(crate) fn new(mastodon: &'a Mastodon<H>, response: Response) -> Result<Self> {
+    pub(crate) fn new<U: Debug + Read>(mastodon: &'a Mastodon<H>, response: Response<U>) -> Result<Self> {
         let (prev, next) = get_links(&response)?;
         Ok(Page {
             initial_items: deserialise(response)?,
@@ -102,7 +103,7 @@ impl<'a, T: Clone + for<'de> Deserialize<'de>, H: HttpSend> Page<'a, T, H> {
     }
 }
 
-fn get_links(response: &Response) -> Result<(Option<Url>, Option<Url>)> {
+fn get_links<T: Debug + Read>(response: &Response<T>) -> Result<(Option<Url>, Option<Url>)> {
     let mut prev = None;
     let mut next = None;
 
