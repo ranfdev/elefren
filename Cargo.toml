@@ -9,6 +9,7 @@ repository = "https://github.com/pwoolcoc/elefren.git"
 keywords = ["api", "web", "social", "mastodon", "wrapper"]
 categories = ["web-programming", "web-programming::http-client", "api-bindings"]
 edition = "2018"
+include = ["src/**/*", "README.md", "CHANGELOG.md", "build.rs"]
 
 [dependencies]
 doc-comment = "0.3"
